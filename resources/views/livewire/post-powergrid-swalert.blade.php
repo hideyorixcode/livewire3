@@ -25,10 +25,11 @@
 
                         <button href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal"
                                 data-bs-target="#formModal" wire:click="create">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <i class="fas fa-fw fa-plus"></i> <span class="">Tambah</span>
                         </button>
 
-
+                        <button type="button" wire:click="alertSuccess" class="btn btn-success">Success Alert</button>
 
                     </div>
                 </div>
@@ -136,6 +137,28 @@
             });
         });
 
+        window.addEventListener('swal:modal', event => {
+            Swal.fire({
+                title: event.detail[0].message,
+                text: event.detail[0].text,
+                icon: event.detail[0].type,
+            });
+        });
 
+
+        window.addEventListener('swal:confirm', event => {
+            Swal.fire({
+                title: event.detail[0].message,
+                text: event.detail[0].text,
+                icon: event.detail[0].type,
+                showCancelButton: true,
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.value) {
+                    window.livewire.dispatch('deleteOnRow');
+                } else if (result.dismiss == "cancel") {
+                }
+            });
+        });
     </script>
 @endpush

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Livewire\PostComponent;
+
+use App\Livewire\NotificationSweetAlert;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,7 +15,7 @@ use App\Livewire\PostComponent;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
+Route::get('notification-sweetalert', NotificationSweetAlert::class);
 Route::get('/', function () {
     return view('welcome');
 });

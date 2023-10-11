@@ -7,7 +7,6 @@ use App\Models\Post;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Exportable;
@@ -20,11 +19,12 @@ use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 use function Laravel\Prompts\alert;
 
-final class PostTable extends PowerGridComponent
+final class PostTableswAlert extends PowerGridComponent
 {
     use WithExport;
 
-    use LivewireAlert;
+    public PostForm $form;
+
 
     public string $sortField = 'id';
 
@@ -33,7 +33,7 @@ final class PostTable extends PowerGridComponent
     public function setUp(): array
     {
         $this->showCheckBox();
-
+//        public PostForm $form;
 
         return [
 
@@ -48,52 +48,6 @@ final class PostTable extends PowerGridComponent
                 ->showRecordCount(),
 //            Responsive::make()
         ];
-    }
-
-    public function header(): array
-    {
-//        return [
-//            Button::add('bulk-delete')
-//                ->slot(__('Bulk delete (<span x-text="window.pgBulkActions.count(\'' . $this->tableName . '\')"></span>)'))
-//                ->class('cursor-pointer block bg-white-200 text-gray-700 ')
-//                ->dispatch('bulkDelete', []),
-//        ];
-
-        return [
-
-
-            Button::add('bulk-delete')
-                ->slot('Hapus Banyak')
-                ->class('d-none')
-                ->dispatch('bulkDelete', []),
-        ];
-    }
-
-
-    protected function getListeners()
-    {
-        return array_merge(
-            parent::getListeners(), [
-            'eventX',
-            'eventY',
-            'bulkDelete',
-        ]);
-    }
-
-
-    public function bulkDelete(): void
-    {
-        if (count($this->checkboxValues) == 0) {
-
-            $this->alert('warning', 'You must select at least one item!');
-//            $this->dispatchBrowserEvent('showAlert', ['message' => 'You must select at least one item!']);
-
-            return;
-        }
-
-        $ids = implode(', ', $this->checkboxValues);
-
-        $this->alert('info', 'You have selected IDs: ' . $ids);
     }
 
     public function datasource(): Builder
@@ -112,6 +66,7 @@ final class PostTable extends PowerGridComponent
         return PowerGrid::columns()
             ->addColumn('id')
             ->addColumn('image')
+            /** Example of custom column using a closure **/
             ->addColumn('image_lower', fn(Post $model) => strtolower(e($model->image)))
             ->addColumn('title')
             ->addColumn('body')
@@ -122,24 +77,20 @@ final class PostTable extends PowerGridComponent
     {
 
         return [
-            Column::action('Action')
-                ->visibleInExport(false),
-            Column::make('No.', 'id')
-                ->index()
-                ->visibleInExport(false),
+            Column::action('Action'),
+            Column::make('No.', '')
+                ->index(),
             Column::make('Id', 'id')
-                ->hidden(true, false)
-                ->visibleInExport(false),
+                ->hidden(true, false),
             Column::make('Image', 'image')
                 ->hidden(true, false),
             Column::make('Title', 'title')
                 ->sortable()
-                ->searchable()
-                ->visibleInExport(true),
+                ->searchable(),
+
             Column::make('Content', 'body')
                 ->sortable()
-                ->searchable()
-                ->visibleInExport(true),
+                ->searchable(),
 
 //            Column::make('Created at', 'created_at_formatted', 'created_at')
 //                ->sortable(),
@@ -158,11 +109,75 @@ final class PostTable extends PowerGridComponent
     }
 
 
+    #[\Livewire\Attributes\On('edit_on_row')]
+    public function edit_on_row($rowId): void
+    {
+        $this->js('alert(' . $rowId . ')');
+
+//        alert($rowId);
+
+
+//        $post = Post::findOrFail($rowId);
+//        $this->form->id = $rowId;
+//        $this->form->title = $post->title;
+//        $this->form->body = $post->body;
+//        $this->dispatch('edit', $rowId);
+//        $this->updateMode = true;
+//        $row = Post::where('id', $rowId)->first();
+//        $this->id_post = $id;
+//        $this->title = $row->title;
+//        $this->image = $row->image;
+//        $this->content = $row->content;
+//        (new Transaction())->editTrx($rowId);
+//
+//        $this->js('edit(' . $rowId . ')');
+//        $this->dispatch('edit', $rowId);
+//        $this->updateMode = true;
+//        $row = Post::where('id', $rowId)->first();
+//        $transaction = new Transaction();
+//        $transaction->updateMode = true;
+//        $transaction->title = $row->title;
+
+//        $this->id_post = $rowId;
+//        $this->title = $row->title;
+//        $this->image = $row->image;
+//        $this->content = $row->content;
+
+    }
+
+    #[\Livewire\Attributes\On('editx')]
+    public function editx($rowId): void
+    {
+        $this->dispatch('edit(' . $rowId . ')');
+//        $this->js('alert(' . $rowId . ')');
+//        $post = Post::findOrFail($rowId);
+//        $this->form->title = $post->title;
+    }
+
     public function editOnRow($rowId)
     {
         $this->dispatch('editPassed', $rowId);
     }
 
+    public function confirmDelete($rowId)
+    {
+
+        \Livewire\withSweetAlert('Are you sure?', 'This action cannot be undone', function() {
+            // Call the Livewire component function upon confirmation
+            $this->deleteUser();
+        });
+//        $this->dispatch('swal:confirm', [
+//
+//            'type' => 'warning',
+//
+//            'message' => 'Are you sure?',
+//
+//            'text' => 'If deleted, you will not be able to recover this imaginary file!',
+//
+//            'rowId' => $rowId,
+//
+//        ]);
+    }
 
     public function deleteOnRow($rowId)
     {
@@ -183,7 +198,7 @@ final class PostTable extends PowerGridComponent
             Button::add('delete')
                 ->render(function (Post $row) {
                     return Blade::render(<<<HTML
-                                         <button class="btn btn-danger btn-sm" wire:click="deleteOnRow('$row->id')">Delete</button>
+                                         <button class="btn btn-danger btn-sm" wire:click="confirmDelete('$row->id')">Delete</button>
                                          HTML
                     );
                 }),
@@ -191,6 +206,18 @@ final class PostTable extends PowerGridComponent
 
         ];
     }
+
+    /*
+    public function actionRules($row): array
+    {
+       return [
+            // Hide button edit for ID 1
+            Rule::button('edit')
+                ->when(fn($row) => $row->id === 1)
+                ->hide(),
+        ];
+    }
+    */
 
 
 }
