@@ -8,17 +8,14 @@ use Livewire\Form;
 
 class PostForm extends Form
 {
+
+    public $id;
+
     #[Rule('required|min:3')]
     public $title;
 
     #[Rule('required|min:3')]
     public $body;
 
-    public function save()
-    {
-        Post::create([
-            'title' => $this->title,
-            'body' => $this->body,
-        ]);
-    }
+
 }

@@ -9,9 +9,10 @@
     <title>{{ $title ?? 'Page Title' }}</title>
 
     @vite('resources/sass/app.scss')
+    @vite('resources/css/app.css')
 
     <!-- Custom styles for this Page-->
-    @yield('custom_styles')
+    @stack('custom_styles')
 
     @livewireStyles
 
@@ -117,13 +118,12 @@
             </footer>
         </div>
     </div>
-    </div>
 
     <!-- Core plugin JavaScript-->
     @vite('resources/js/app.js')
 
     <!-- Page level custom scripts -->
-    @yield('custom_scripts')
+    @stack('custom_scripts')
 
     @livewireScripts
 

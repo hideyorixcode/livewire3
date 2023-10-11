@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\Attributes\Rule;
 use Livewire\WithPagination;
 use App\Livewire\Forms\PostForm;
+use function Laravel\Prompts\alert;
 
 class PostComponent extends Component
 {
@@ -15,81 +16,88 @@ class PostComponent extends Component
 
     public PostForm $form;
 
-    public $title = 'Posts';
     public $postId;
 
-    // #[Rule('required|min:3')]
-    // public $title;
+    protected $listeners = ['editPassed' => 'edit', 'deletePassed' => 'delete'];
 
-    // #[Rule('required|min:3')]
-    // public $body;
 
-    public $isOpen = 0;
+    private function resetForm()
+    {
+        $this->resetValidation();
+        $this->reset('form.title', 'form.body', 'form.id', 'postId');
+    }
+
+    public function closeModal()
+    {
+
+        $this->resetForm();
+        $this->dispatch('closeModal');
+    }
 
     public function create()
-   {
-       $this->reset('form.title','form.body', 'postId');
-       $this->openModal();
-   }
-
-
+    {
+        $this->resetForm();
+    }
 
 
     public function store()
     {
         $this->validate();
-        $this->form->save();
+        $dataStore = [
+            'title' => $this->form->title,
+            'body' => $this->form->body,
+        ];
+        Post::create($dataStore);
         session()->flash('success', 'Post created successfully.');
-        $this->reset('form.title','form.body');
         $this->closeModal();
+        $this->dispatch('pg:eventRefresh-table1');
+
+//        $this->closeModal();
     }
 
     public function edit($id)
-   {
-       $post = Post::findOrFail($id);
-       $this->postId = $id;
-       $this->form->title = $post->title;
-       $this->form->body = $post->body;
+    {
+//        $this->js('alert(' . $id . ')');
+//        $this->js(alert($this->id));
+        $this->resetValidation();
+        $post = Post::findOrFail($id);
+        $this->postId = $id;
+        $this->form->id = $id;
+        $this->form->title = $post->title;
+        $this->form->body = $post->body;
+    }
 
-       $this->openModal();
-   }
+    public function update()
+    {
+        if ($this->postId) {
+            $this->validate();
+            $post = Post::findOrFail($this->postId);
+            $dataUpdate = [
+                'title' => $this->form->title,
+                'body' => $this->form->body,
+            ];
 
-   public function update()
-   {
-       if ($this->postId) {
-           $post = Post::findOrFail($this->postId);
-           $post->update([
-               'title' => $this->form->title,
-               'body' => $this->form->body,
-           ]);
-           $this->postId='';
-           session()->flash('success', 'Post updated successfully.');
-           $this->closeModal();
-           $this->reset('form.title','form.body');
-       }
-   }
+            $post->update($dataUpdate);
+            session()->flash('success', 'Post updated successfully.');
+//            $this->closeModal();
+            $this->closeModal();
+            $this->dispatch('pg:eventRefresh-table1');
+        }
+    }
 
     public function delete($id)
-  {
-      Post::find($id)->delete();
-      session()->flash('success', 'Post deleted successfully.');
-      $this->reset('form.title','form.body');
-  }
-
-
-  public function openModal()
     {
-        $this->isOpen = true;
-        $this->resetValidation();
+
+        Post::find($id)->delete();
+        session()->flash('success', 'Post deleted successfully.');
+        $this->resetForm();
+        $this->dispatch('pg:eventRefresh-table1');
     }
-    public function closeModal()
-    {
-        $this->isOpen = false;
-    }
+
 
     public function render()
     {
-        return view('livewire.post-component',[
+        return view('livewire.post-powergrid', [
             'posts' => Post::paginate(5)
         ]);
     }
