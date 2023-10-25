@@ -7,49 +7,52 @@
     pointer-events: none;
 }
 
-table thead th, .table thead th {
-    color: var(--tblr-muted);
-    background: #0f3a80;
+table thead th,
+.table thead th {
+    color             : var(--tblr-muted);
+    background        : #0f3a80;
     /*background-color: rgb(24,36,51);*/
-    /*font-family: Tahoma, sans-serif;*/
-    font-size: .625rem;
-    font-weight: var(--tblr-font-weight-bold);
-    /*text-transform: uppercase;*/
-    letter-spacing: .04em;
-    line-height: 1rem;
-    color: white;
-    padding-top: 0.4rem;
-    padding-bottom: 0.4rem;
-    white-space: nowrap;
-    position: relative;
+    /*font-family     : Tahoma, sans-serif;*/
+    font-size         : .625rem;
+    font-weight       : var(--tblr-font-weight-bold);
+    /*text-transform  : uppercase;*/
+    letter-spacing    : .04em;
+    line-height       : 1rem;
+    color             : white;
+    padding-top       : 0.4rem;
+    padding-bottom    : 0.4rem;
+    white-space       : nowrap;
+    position          : relative;
 }
 
-table tbody td, .table tbody td {
+table tbody td,
+.table tbody td {
     /*font-family: Tahoma, sans-serif;*/
-    font-size: .8rem;
-    padding-top: 0.2rem;
+    font-size     : .8rem;
+    padding-top   : 0.2rem;
     padding-bottom: 0.2rem;
-    white-space: nowrap;
+    white-space   : nowrap;
     vertical-align: middle;
 }
 
 .resizer {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 5px;
-    cursor: col-resize;
+    position   : absolute;
+    top        : 0;
+    right      : 0;
+    width      : 5px;
+    cursor     : col-resize;
     user-select: none;
 }
+
 .resizer:hover,
 .resizing {
     border-right: 2px solid blue;
 }
 
 .resizable {
-    border: 1px solid gray;
-    height: 100px;
-    width: 100px;
+    border  : 1px solid gray;
+    height  : 100px;
+    width   : 100px;
     position: relative;
 }
 
@@ -59,8 +62,8 @@ table tbody td, .table tbody td {
 
 .ts-wrapper .option .subtitle {
     font-size: 12px;
-    display: block;
-    color: #a0a0a0;
+    display  : block;
+    color    : #a0a0a0;
 }
 
 /*table {*/

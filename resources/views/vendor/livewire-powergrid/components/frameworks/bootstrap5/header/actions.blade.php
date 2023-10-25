@@ -5,7 +5,7 @@
 @endphp
 <div>
     @foreach ($actions as $action)
-        <div @class(['me-1' => $loop->last, 'btn-group'])>
+        <div @class(["me-1" => $loop->last, "btn-group btn-group-sm"])>
             {!! $action !!}
         </div>
     @endforeach
